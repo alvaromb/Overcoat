@@ -102,11 +102,13 @@
     
     NSArray *models = [result isKindOfClass:[NSArray class]] ? result : @[result];
     for (MTLModel<MTLManagedObjectSerializing> *model in models) {
-        NSError *error = nil;
-        [MTLManagedObjectAdapter managedObjectFromModel:model
-                                   insertingIntoContext:self.managedObjectContext
-                                                  error:&error];
-        NSAssert(error == nil, @"%@ saveResult failed with error: %@", self, error);
+        if ([model conformsToProtocol:@protocol(MTLManagedObjectSerializing)]) {
+            NSError *error = nil;
+            [MTLManagedObjectAdapter managedObjectFromModel:model
+                                       insertingIntoContext:self.managedObjectContext
+                                                      error:&error];
+            NSAssert(error == nil, @"%@ saveResult failed with error: %@", self, error);
+        }
     }
     
     NSManagedObjectContext *context = self.managedObjectContext;
